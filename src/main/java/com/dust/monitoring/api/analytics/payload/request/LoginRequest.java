@@ -1,4 +1,4 @@
-package payload.request;
+package com.dust.monitoring.api.analytics.payload.request;
 
 
 import lombok.AllArgsConstructor;

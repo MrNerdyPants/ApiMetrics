@@ -5,6 +5,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -23,8 +24,13 @@ public class JwtUtils {
     @Value("${jwt.secret}")
     private String secret;
 
+    @Getter
     @Value("${jwt.expirationMs}")
     private long jwtExpirationMs;
+
+    @Getter
+    @Value("${jwt.refresh.expirationMs}")
+    private long jwtRefreshExpirationMs;
 
     @PostConstruct
     public void init() {
@@ -34,16 +40,17 @@ public class JwtUtils {
     }
 
     // Create a token for the given user
-    public String createToken(Users users) {
+    public String createToken(Users users, Boolean isAccessToken) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("username", users.getUsername());
+        claims.put("email", users.getEmail());
         claims.put("roles", users.getRoles());
 
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(users.getUsername())
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
+                .setExpiration(new Date(System.currentTimeMillis()
+                        + (isAccessToken ? jwtExpirationMs : jwtRefreshExpirationMs)))
                 .signWith(key)
                 .compact();
     }

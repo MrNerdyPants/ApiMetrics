@@ -1,6 +1,9 @@
 package com.dust.monitoring.api.analytics.service;
 
 import com.dust.monitoring.api.analytics.entity.Users;
+import com.dust.monitoring.api.analytics.payload.request.LoginRequest;
+import com.dust.monitoring.api.analytics.payload.request.RegisterRequest;
+import com.dust.monitoring.api.analytics.payload.response.LoginResponse;
 import com.dust.monitoring.api.analytics.repository.UserRepository;
 import com.dust.monitoring.api.analytics.utils.JwtUtils;
 import com.dust.monitoring.api.analytics.utils.UtilityService;
@@ -15,9 +18,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Service;
-import payload.request.LoginRequest;
-import payload.request.RegisterRequest;
-import payload.response.LoginResponse;
+
+import java.util.Date;
 
 @Slf4j
 @Service
@@ -56,7 +58,9 @@ public class AuthService {
         Users user = mapper.convertValue(authentication.getPrincipal(), Users.class);
 
 
-        return new LoginResponse(jwtUtils.createToken(user));
+        return new LoginResponse(jwtUtils.createToken(user, true)
+                , jwtUtils.createToken(user, false), System.currentTimeMillis(),
+                System.currentTimeMillis() + jwtUtils.getJwtExpirationMs());
     }
 
     public void register(RegisterRequest request) {

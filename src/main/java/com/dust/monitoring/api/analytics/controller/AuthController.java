@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import payload.request.LoginRequest;
-import payload.request.RegisterRequest;
-import payload.response.LoginResponse;
+import com.dust.monitoring.api.analytics.payload.request.LoginRequest;
+import com.dust.monitoring.api.analytics.payload.request.RegisterRequest;
+import com.dust.monitoring.api.analytics.payload.response.LoginResponse;
 
 @RestController
 @RequestMapping("/auth")
