@@ -16,6 +16,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.scrypt.SCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.security.Security;
 
@@ -28,12 +29,14 @@ class SecurityConfiguration {
 
     private String WHITE_LIST_URL = "/auth/**";
     private final CustomUserDetailService userDetailsService;
+    private final AuthTokenFilter authTokenFilter;
 
 
     @Autowired
-    public SecurityConfiguration(CustomUserDetailService customUserDetailsService) {
+    public SecurityConfiguration(CustomUserDetailService customUserDetailsService, AuthTokenFilter authTokenFilter) {
         this.userDetailsService = customUserDetailsService;
 
+        this.authTokenFilter = authTokenFilter;
     }
 
     @Autowired
@@ -69,11 +72,11 @@ class SecurityConfiguration {
                         .authenticated())
 //                .exceptionHandling(ex -> ex.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
-//                .authenticationProvider(authenticationProvider())
-//                .addFilterBefore(
-//                        authenticationJwtTokenFilter(),
-//                        UsernamePasswordAuthenticationFilter.class
-//                )
+                .authenticationProvider(authenticationProvider())
+                .addFilterBefore(
+                        authTokenFilter,
+                        UsernamePasswordAuthenticationFilter.class
+                )
         ;
 
         return http.build();

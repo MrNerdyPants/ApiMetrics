@@ -14,6 +14,7 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 
 @Component
@@ -58,11 +59,27 @@ public class JwtUtils {
     // Validate the token
     public boolean validateToken(String token) {
         try {
+            if (isTokenExpired(token)) {
+                return false;
+            }
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public String extractUsername(String token) {
+        return extractClaim(token, Claims::getSubject);
+    }
+
+    private boolean isTokenExpired(String token) {
+        return extractClaim(token, Claims::getExpiration).before(new Date());
+    }
+
+    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+        final Claims claims = getClaimsFromToken(token);
+        return claimsResolver.apply(claims);
     }
 
     // Extract username from the token
